@@ -57,14 +57,14 @@ int main(int argc, char *argv[]) {
 
     // Criação do socket
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
-        perror("Erro ao criar o socket");
+        fprintf(stderr, "Erro ao criar o socket.\n");
         return EXIT_FAILURE;
     }
 
     // Configura timeout para recvfrom
     struct timeval timeout = {TIMEOUT_SECONDS, 0};
     if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
-        perror("Erro ao configurar timeout");
+        fprintf(stderr, "Erro ao configurar timeout.\n");
         close(sockfd);
         return EXIT_FAILURE;
     }
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(NTP_SERVER_PORT);
     if (inet_pton(AF_INET, server_ip, &server_addr.sin_addr) <= 0) {
-        perror("Erro ao configurar o endereço IP");
+        fprintf(stderr, "Erro ao configurar o endereço IP: endereço inválido \"%s\".\n", server_ip);
         close(sockfd);
         return EXIT_FAILURE;
     }
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
         // Envia o pacote NTP para o servidor
         if (sendto(sockfd, &packet, sizeof(ntp_packet), 0, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-            perror("Erro ao enviar a mensagem");
+            fprintf(stderr, "Erro ao enviar a mensagem ao servidor.\n");
             close(sockfd);
             return EXIT_FAILURE;
         }
