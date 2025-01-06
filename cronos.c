@@ -79,36 +79,47 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    // Envia o pacote NTP para o servidor
-    if (sendto(sockfd, &packet, sizeof(ntp_packet), 0, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-        perror("Erro ao enviar a mensagem");
-        close(sockfd);
-        return EXIT_FAILURE;
-    }
+    int attempts = 0;
+    int success = 0;
 
-    // Recebe a resposta do servidor
-    socklen_t addr_len = sizeof(server_addr);
-    int recv_len = recvfrom(sockfd, &packet, sizeof(ntp_packet), 0, (struct sockaddr *)&server_addr, &addr_len);
-    if (recv_len < 0) {
-        perror("Erro ao receber dados do servidor");
-        close(sockfd);
-        return EXIT_FAILURE;
-    } else if (recv_len < sizeof(ntp_packet)) {
-        fprintf(stderr, "Erro: pacote recebido tem tamanho inesperado (%d bytes)\n", recv_len);
-        close(sockfd);
-        return EXIT_FAILURE;
-    }
+    while (attempts < 2 && !success) {
+        attempts++;
 
-    // Verifica se o campo txTm_s é válido antes de usá-lo
-    uint32_t txTm = ntohl(packet.txTm_s);
-    if (txTm == 0) {
-        fprintf(stderr, "Erro: campo txTm_s do pacote está vazio ou inválido.\n");
-        close(sockfd);
-        return EXIT_FAILURE;
-    }
+        // Envia o pacote NTP para o servidor
+        if (sendto(sockfd, &packet, sizeof(ntp_packet), 0, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+            perror("Erro ao enviar a mensagem");
+            close(sockfd);
+            return EXIT_FAILURE;
+        }
 
-    // Exibe a hora recebida
-    print_time(txTm);
+        // Recebe a resposta do servidor
+        socklen_t addr_len = sizeof(server_addr);
+        int recv_len = recvfrom(sockfd, &packet, sizeof(ntp_packet), 0, (struct sockaddr *)&server_addr, &addr_len);
+        if (recv_len < 0) {
+            if (attempts == 2) {
+                fprintf(stderr, "Data/hora: não foi possível contactar servidor\n");
+                close(sockfd);
+                return EXIT_FAILURE;
+            }
+            continue;
+        } else if (recv_len < sizeof(ntp_packet)) {
+            fprintf(stderr, "Erro: pacote recebido tem tamanho inesperado (%d bytes)\n", recv_len);
+            close(sockfd);
+            return EXIT_FAILURE;
+        }
+
+        // Verifica se o campo txTm_s é válido antes de usá-lo
+        uint32_t txTm = ntohl(packet.txTm_s);
+        if (txTm == 0) {
+            fprintf(stderr, "Erro: campo txTm_s do pacote está vazio ou inválido.\n");
+            close(sockfd);
+            return EXIT_FAILURE;
+        }
+
+        // Exibe a hora recebida
+        print_time(txTm);
+        success = 1;
+    }
 
     // Fecha o socket
     close(sockfd);
