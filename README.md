@@ -1,5 +1,5 @@
 
-# Cronos - NTP
+# Cronos - SNTP
 
   
 
@@ -34,11 +34,11 @@ make
 Isso irá gerar um executável chamado `cronos`. ✅🔧🏁
 
 ## Como Executar a Aplicação ▶️🖥️📡
-Após a compilação, execute o programa passando o endereço IP de um servidor NTP como argumento: 🌐📥📊
+Após a compilação, execute o programa passando o endereço IP de um servidor SNTP como argumento: 🌐📥📊
 ```bash
-./cronos <IP_DO_SERVIDOR_NTP>
+./cronos <IP_DO_SERVIDOR_SNTP>
 ```
-Substitua `<IP_DO_SERVIDOR_NTP>` pelo endereço IPv4 do servidor que você deseja consultar. 💡📌🌟
+Substitua `<IP_DO_SERVIDOR_SNTP>` pelo endereço IPv4 do servidor que você deseja consultar. 💡📌🌟
 
 Exemplo de uso:
 ```bash
@@ -61,7 +61,7 @@ Remove o executável e os arquivos gerados durante a compilação.
 
 **Análise de memória:**
 ```bash
-make valgrind <IP_DO_SERVIDOR_NTP>
+make valgrind <IP_DO_SERVIDOR_SNTP>
 ```
 Executa o Valgrind para análise de uso de memória, utilizando o executável gerado. 🔍🧠✔️
 
@@ -77,11 +77,11 @@ Data/hora: não foi possível contactar servidor
 ```
 **Uso incorreto:**
 ```bash
-Uso: ./cronos <IP do servidor NTP>
+Uso: ./cronos <IP do servidor SNTP>
 ```
 **Endereço IP inválido:**
 ```bash
-Erro ao configurar o endereço IP: endereço inválido "<IP_DO_SERVIDOR_NTP>"
+Erro ao configurar o endereço IP: endereço inválido "<IP_DO_SERVIDOR_SNTP>"
 ```
 ### Limitações Conhecidas 🚧🌐📋
 
