@@ -6,6 +6,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <locale.h>
+#include <ctype.h>
 
 #define NTP_TIMESTAMP_DELTA 2208988800ull
 #define NTP_SERVER_PORT 123
@@ -35,9 +37,27 @@ typedef struct {
 void print_time(uint32_t txTm) {
     time_t rawtime = (time_t)(txTm - NTP_TIMESTAMP_DELTA);
     struct tm *ptm = localtime(&rawtime);
+    
+    if (ptm == NULL) {
+        fprintf(stderr, "Erro ao converter o tempo.\n");
+        return;
+    }
+
     char buffer[50];
-    strftime(buffer, sizeof(buffer), "%a %b %d %H:%M:%S %Y", ptm);
-    printf("Data/hora: %s\n", buffer);
+    char day[10];
+    char month[10];
+
+    if (strftime(buffer, sizeof(buffer), "%d %H:%M:%S %Y", ptm) == 0 ||
+        strftime(day, sizeof(day), "%a", ptm) == 0 ||
+        strftime(month, sizeof(month), "%b", ptm) == 0) {
+        fprintf(stderr, "Erro ao formatar a data.\n");
+        return;
+    }
+
+    day[0] = toupper(day[0]);
+    month[0] = toupper(month[0]);
+
+    printf("Data/hora: %s %s %s\n", day, month, buffer);
 }
 
 int main(int argc, char *argv[]) {
@@ -47,16 +67,21 @@ int main(int argc, char *argv[]) {
     }
 
     const char *server_ip = argv[1];
-    int sockfd;
+    int sockfd = -1;
     struct sockaddr_in server_addr;
     ntp_packet packet;
+
+    if (setlocale(LC_TIME, "pt_BR.UTF-8") == NULL) {
+        fprintf(stderr, "Erro ao configurar a localidade.\n");
+    }
 
     // Inicializa o pacote com zeros e configura o campo li_vn_mode
     memset(&packet, 0, sizeof(ntp_packet));
     packet.li_vn_mode = 0x1B; // LI = 0, VN = 3, Mode = 3 (client)
 
     // Criação do socket
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+    sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sockfd < 0) {
         fprintf(stderr, "Erro ao criar o socket.\n");
         return EXIT_FAILURE;
     }
@@ -80,9 +105,7 @@ int main(int argc, char *argv[]) {
     }
 
     int attempts = 0;
-    int success = 0;
-
-    while (attempts < 2 && !success) {
+    while (attempts < 2) {
         attempts++;
 
         // Envia o pacote NTP para o servidor
@@ -102,7 +125,7 @@ int main(int argc, char *argv[]) {
                 return EXIT_FAILURE;
             }
             continue;
-        } else if (recv_len < sizeof(ntp_packet)) {
+        } else if (recv_len < (int)sizeof(ntp_packet)) {
             fprintf(stderr, "Erro: pacote recebido tem tamanho inesperado (%d bytes)\n", recv_len);
             close(sockfd);
             return EXIT_FAILURE;
@@ -118,7 +141,7 @@ int main(int argc, char *argv[]) {
 
         // Exibe a hora recebida
         print_time(txTm);
-        success = 1;
+        break;
     }
 
     // Fecha o socket

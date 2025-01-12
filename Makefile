@@ -22,11 +22,6 @@ $(EXEC): $(SRC)
 	$(CC) $(CFLAGS) -o $(EXEC) $(SRC)
 	@echo "$(GREEN)✅ Compilação concluída!$(RESET)"
 
-cppcheck:
-	@echo "$(CYAN)🔍 Executando Cppcheck para análise estática...$(RESET)"
-	cppcheck --enable=all --output-file=cppcheck_report.txt $(SRC)
-	@echo "$(GREEN)✅ Relatório do Cppcheck gerado: cppcheck_report.txt$(RESET)"
-
 valgrind:
 	@echo "$(PURPLE)🔍 Executando Valgrind para análise de memória com argumento: $(ARG)...$(RESET)"
 	valgrind --leak-check=full --track-origins=yes ./$(EXEC) $(ARG)
@@ -41,7 +36,6 @@ help:
 	@echo "$(YELLOW)💡 Comandos disponíveis no Makefile:$(RESET)"
 	@echo "$(CYAN)  make$(RESET): Compila o programa."
 	@echo "$(CYAN)  make clean$(RESET): Remove o executável e arquivos gerados."
-	@echo "$(CYAN)  make cppcheck$(RESET): Executa análise estática de código com Cppcheck."
 	@echo "$(CYAN)  make valgrind <argumento>$(RESET): Executa análise de memória com Valgrind e passa o argumento ao programa."
 
 %:
