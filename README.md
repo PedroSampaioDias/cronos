@@ -13,11 +13,11 @@
 
 - **Ferramentas:**
 
-- **Makefile:** Automatiza o processo de compilação e gerenciamento de dependências. O Makefile utilizado neste projeto inclui: 🚀📂🔄
+	- **Makefile:** Automatiza o processo de compilação e gerenciamento de dependências. O Makefile utilizado neste projeto inclui: 🚀📂🔄
 
-- **Cppcheck:** Ferramenta para análise estática de código, usada para detectar erros comuns e possíveis problemas em códigos em C/C++. 🧐🖥️✔️
+	- **Cppcheck:** Ferramenta para análise estática de código, usada para detectar erros comuns e possíveis problemas em códigos em C/C++. 🧐🖥️✔️
 
-- **Valgrind:** Ferramenta para identificação de vazamentos de memória e erros relacionados à alocação dinâmica de memória. 🔍⚙️♻️
+	- **Valgrind:** Ferramenta para identificação de vazamentos de memória e erros relacionados à alocação dinâmica de memória. 🔍⚙️♻️
 
 ## Como Construir a Aplicação 🏗️⚡💾
 
