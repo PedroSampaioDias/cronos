@@ -29,7 +29,7 @@
 
 Execute o comando:
 ```bash
-sudo apt install build-essential
+make
 ```
 Isso irá gerar um executável chamado `cronos`. ✅🔧🏁
 
